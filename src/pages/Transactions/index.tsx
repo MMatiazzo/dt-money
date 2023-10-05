@@ -1,3 +1,4 @@
+import { useContext } from 'react';
 import { Header } from '../../components/Header';
 import { Summary } from '../../components/Summary';
 import { SearchForm } from './components/SearchForm/intex';
@@ -6,8 +7,12 @@ import {
 	TransactionsContainer,
 	TransactionsTable,
 } from './styles';
+import { TransactionsContext } from '../../contexts/TransactionsContext';
+import { dateFormatter, priceFomatter } from '../../utils/formatters';
 
 export function Transactions() {
+	const { transactions } = useContext(TransactionsContext);
+
 	return (
 		<div>
 			<Header />
@@ -16,22 +21,23 @@ export function Transactions() {
 				<SearchForm />
 				<TransactionsTable>
 					<tbody>
-						<tr>
-							<td width="50%">Desenvolvimento de site</td>
-							<td>
-								<PriceHighlight variant="income">R$ 12.000,00</PriceHighlight>
-							</td>
-							<td>Venda</td>
-							<td>13/11/2023</td>
-						</tr>
-						<tr>
-							<td width="50%">Batata frita</td>
-							<td>
-								<PriceHighlight variant="outcome">- R$ 12,00</PriceHighlight>
-							</td>
-							<td>Alimentação</td>
-							<td>13/11/2023</td>
-						</tr>
+						{transactions.map(
+							({ id, description, type, category, price, createdAt }) => {
+								return (
+									<tr key={id}>
+										<td width="50%">{description}</td>
+										<td>
+											<PriceHighlight variant={type}>
+												{type === 'outcome' && '- '}
+												{priceFomatter.format(price)}
+											</PriceHighlight>
+										</td>
+										<td>{category}</td>
+										<td>{dateFormatter.format(new Date(createdAt))}</td>
+									</tr>
+								);
+							}
+						)}
 					</tbody>
 				</TransactionsTable>
 			</TransactionsContainer>
